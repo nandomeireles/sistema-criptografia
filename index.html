@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sistema de Análise de Algoritmos de Ordenação – APS</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-dark: #0f3d1e;
+      --green-mid:  #1a5c2e;
+      --green-light:#2d8a47;
+      --accent:     #4fc86a;
+      --bg:         #0b0f0d;
+      --surface:    #141c16;
+      --surface2:   #1c2920;
+      --border:     #2a3d2e;
+      --text:       #d4e8d8;
+      --text-dim:   #7fa88a;
+      --red:        #e05555;
+      --yellow:     #e0b855;
+      --blue:       #5591e0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%);
+      padding: 18px 32px;
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .logo-icon { font-size: 2.4rem; }
+    .header-text h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: .5px;
+    }
+    .header-text p {
+      font-size: .8rem;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+    .badge {
+      margin-left: auto;
+      background: rgba(79,200,106,.15);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: .75rem;
+      color: var(--accent);
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 0;
+    }
+
+    .left-panel {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .panel-title {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin-bottom: 4px;
+    }
+
+    .tabs {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      padding: 8px 6px;
+      font-size: .78rem;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .tab-btn.active {
+      background: var(--green-mid);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    label {
+      display: block;
+      font-size: .8rem;
+      color: var(--text-dim);
+      margin-bottom: 5px;
+    }
+    input[type=number], input[type=text], textarea, select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: .85rem;
+      padding: 8px 10px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    input[type=number]:focus, input[type=text]:focus,
+    textarea:focus, select:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 80px; font-family: monospace; }
+    .form-group { margin-bottom: 12px; }
+
+    .algo-list { display: flex; flex-direction: column; gap: 6px; }
+    .algo-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: border-color .2s;
+    }
+    .algo-item:hover { border-color: var(--accent); }
+    .algo-item input[type=checkbox] { display: none; }
+    .algo-check {
+      width: 16px; height: 16px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+      flex-shrink: 0;
+    }
+    .algo-item.checked .algo-check {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .algo-item.checked .algo-check::after {
+      content: '✓';
+      color: #000;
+      font-size: .7rem;
+      font-weight: 900;
+    }
+    .algo-info { flex: 1; }
+    .algo-name { font-size: .85rem; font-weight: 600; }
+    .algo-complex { font-size: .7rem; color: var(--text-dim); margin-top: 1px; }
+    .algo-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    .run-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--green-mid), var(--green-light));
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px;
+      cursor: pointer;
+      transition: all .2s;
+      letter-spacing: .5px;
+    }
+    .run-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+    .run-btn:active { transform: translateY(0); }
+    .run-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    .right-panel {
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .placeholder {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      gap: 12px;
+      text-align: center;
+      padding: 40px;
+    }
+    .placeholder .icon { font-size: 3.5rem; }
+    .placeholder h2 { font-size: 1.1rem; color: var(--text-dim); }
+    .placeholder p { font-size: .85rem; max-width: 320px; line-height: 1.6; }
+
+    .results-hidden { display: none; }
+    .results-visible { display: flex; flex-direction: column; gap: 24px; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .card-title {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .data-preview {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: .8rem;
+      color: var(--text-dim);
+      word-break: break-all;
+      max-height: 80px;
+      overflow: hidden;
+    }
+    .data-preview span { color: var(--accent); }
+
+    .stats-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .stat-card {
+      flex: 1;
+      min-width: 120px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+    }
+    .stat-label { font-size: .7rem; color: var(--text-dim); margin-bottom: 4px; }
+    .stat-value { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: .75rem;
+      letter-spacing: .8px;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 11px 14px;
+      font-size: .85rem;
+      border-bottom: 1px solid var(--border);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+    .winner td:first-child { color: var(--accent); font-weight: 700; }
+    .rank-badge {
+      display: inline-block;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      text-align: center; line-height: 22px;
+      font-size: .72rem; font-weight: 700;
+    }
+    .rank-1 { background: #ffd700; color: #000; }
+    .rank-2 { background: #c0c0c0; color: #000; }
+    .rank-3 { background: #cd7f32; color: #000; }
+    .rank-other { background: var(--surface2); color: var(--text-dim); }
+
+    .bar-wrap { display: flex; align-items: center; gap: 10px; }
+    .bar-outer {
+      flex: 1; height: 8px;
+      background: var(--surface2);
+      border-radius: 4px; overflow: hidden;
+    }
+    .bar-inner { height: 100%; border-radius: 4px; transition: width .5s ease; }
+    .time-val { font-size: .8rem; min-width: 70px; text-align: right; }
+
+    canvas { width: 100% !important; }
+
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .compare-block h4 { font-size: .75rem; color: var(--text-dim); margin-bottom: 8px; letter-spacing: .5px; }
+
+    .spinner {
+      display: none;
+      width: 20px; height: 20px;
+      border: 2px solid rgba(255,255,255,.2);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 10px 32px;
+      font-size: .72rem;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .file-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface2);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      cursor: pointer;
+      transition: border-color .2s;
+      width: 100%;
+      color: var(--text-dim);
+      font-size: .82rem;
+      text-align: center;
+      justify-content: center;
+    }
+    .file-btn:hover { border-color: var(--accent); color: var(--accent); }
+    #fileInput { display: none; }
+    .file-name { font-size: .75rem; color: var(--accent); margin-top: 6px; display: none; }
+
+    @media (max-width: 800px) {
+      main { grid-template-columns: 1fr; }
+      .left-panel { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon">🛰️</div>
+  <div class="header-text">
+    <h1>Sistema de Análise de Performance de Algoritmos de Ordenação</h1>
+    <p>Geoprocessamento de Imagens — Monitoramento da Floresta Amazônica · APS 2020/2</p>
+  </div>
+  <div class="badge">Estrutura de Dados</div>
+</header>
+
+<main>
+  <div class="left-panel">
+
+    <div>
+      <div class="panel-title">Entrada de Dados</div>
+      <div class="tabs" style="margin-bottom:12px">
+        <button class="tab-btn active" onclick="switchTab('random',this)">🎲 Aleatório</button>
+        <button class="tab-btn" onclick="switchTab('manual',this)">✏️ Manual</button>
+        <button class="tab-btn" onclick="switchTab('file',this)">📂 Arquivo</button>
+      </div>
+
+      <div class="tab-content active" id="tab-random">
+        <div class="form-group">
+          <label>Quantidade de elementos</label>
+          <select id="randomSize">
+            <option value="100">100 elementos</option>
+            <option value="500">500 elementos</option>
+            <option value="1000" selected>1.000 elementos</option>
+            <option value="5000">5.000 elementos</option>
+            <option value="10000">10.000 elementos</option>
+            <option value="50000">50.000 elementos</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tipo de distribuição</label>
+          <select id="randomType">
+            <option value="random">Aleatório</option>
+            <option value="sorted">Já ordenado (crescente)</option>
+            <option value="reversed">Invertido (decrescente)</option>
+            <option value="partial">Parcialmente ordenado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Intervalo de valores</label>
+          <div style="display:flex;gap:8px">
+            <input type="number" id="rangeMin" value="1" placeholder="Mín"/>
+            <input type="number" id="rangeMax" value="1000000" placeholder="Máx"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-manual">
+        <div class="form-group">
+          <label>Digite os valores separados por vírgula ou espaço:</label>
+          <textarea id="manualInput" placeholder="Ex: 42, 7, 100, 3, 88, 15, 56, 29..."></textarea>
+        </div>
+        <div style="font-size:.75rem;color:var(--text-dim)">
+          💡 Você pode colar grandes conjuntos de dados diretamente aqui.
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-file">
+        <input type="file" id="fileInput" accept=".txt,.csv"/>
+        <div class="file-btn" onclick="document.getElementById('fileInput').click()">
+          📁 Clique para selecionar arquivo (.txt ou .csv)
+        </div>
+        <div class="file-name" id="fileName"></div>
+        <div style="margin-top:12px;font-size:.75rem;color:var(--text-dim);line-height:1.6">
+          O arquivo deve conter números separados por vírgula, espaço ou linha.
+          Simule os dados catalogados dos satélites carregando um arquivo externo.
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-title">Algoritmos de Ordenação</div>
+      <div class="algo-list" id="algoList">
+        <label class="algo-item checked" data-algo="bubble">
+          <input type="checkbox" checked/>
+          <div class="algo-check"></div>
+          <div class="algo-info">
+            <div class="algo-name">Bubble Sort</div>
+            <div class="algo-complex">O(n²) med · O(n) melhor · Estável</div>
+          </div>
+          <div class="algo-dot" style="background:#e05555"></div>
+        </label>
+        <label class="algo-item checked" data-algo="selection">
+          <input type="checkbox" checked/>
+          <div class="algo-check"></div>
+          <div class="algo-info">
+            <div class="algo-name">Selection Sort</div>
+            <div class="algo-complex">O(n²) sempre · Instável</div>
+          </div>
+          <div class="algo-dot" style="background:#e0b855"></div>
+        </label>
+        <label class="algo-item checked" data-algo="insertion">
+          <input type="checkbox" checked/>
+          <div class="algo-check"></div>
+          <div class="algo-info">
+            <div class="algo-name">Insertion Sort</div>
+            <div class="algo-complex">O(n²) med · O(n) melhor · Estável</div>
+          </div>
+          <div class="algo-dot" style="background:#5591e0"></div>
+        </label>
+        <label class="algo-item checked" data-algo="quick">
+          <input type="checkbox" checked/>
+          <div class="algo-check"></div>
+          <div class="algo-info">
+            <div class="algo-name">Quick Sort</div>
+            <div class="algo-complex">O(n log n) med · O(n²) pior · Instável</div>
+          </div>
+          <div class="algo-dot" style="background:#a855e0"></div>
+        </label>
+        <label class="algo-item checked" data-algo="merge">
+          <input type="checkbox" checked/>
+          <div class="algo-info">
+            <div class="algo-name">Merge Sort</div>
+            <div class="algo-complex">O(n log n) sempre · Estável</div>
+          </div>
+          <div class="algo-dot" style="background:#4fc86a"></div>
+        </label>
+      </div>
+    </div>
+
+    <div>
+      <button class="run-btn" id="runBtn" onclick="runAll()">
+        <span id="btnText">▶️ Executar Ordenação</span>
+        <div class="spinner" id="spinner"></div>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="right-panel" id="rightPanel">
+
+    <div class="placeholder" id="placeholder">
+      <div class="icon">🌿</div>
+      <h2>Sistema pronto para execução</h2>
+      <p>Configure os parâmetros à esquerda, selecione os algoritmos desejados e clique em <strong>Executar Ordenação</strong> para analisar a performance.</p>
+      <p style="margin-top:8px;font-size:.75rem">Este sistema simula o processamento e catalogação das ~100 mil imagens diárias captadas por satélites de monitoramento da Floresta Amazônica.</p>
+    </div>
+
+    <div class="results-hidden" id="results">
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total de elementos</div>
+          <div class="stat-value" id="statN">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Algoritmo mais rápido</div>
+          <div class="stat-value" id="statFastest">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Melhor tempo</div>
+          <div class="stat-value" id="statBestTime">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Algoritmos testados</div>
+          <div class="stat-value" id="statCount">—</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Dados — Comparação Antes / Depois (20 primeiros elementos)</div>
+        <div class="compare-grid">
+          <div class="compare-block">
+            <h4>ANTES DA ORDENAÇÃO</h4>
+            <div class="data-preview" id="previewBefore"></div>
+          </div>
+          <div class="compare-block">
+            <h4>APÓS A ORDENAÇÃO</h4>
+            <div class="data-preview" id="previewAfter"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Tabela de Performance</div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Algoritmo</th>
+              <th>Tempo de Execução</th>
+              <th>Tempo Relativo</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Gráfico Comparativo de Performance</div>
+        <canvas id="chart" height="220"></canvas>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Análise do Cenário</div>
+        <div id="analysisText" style="font-size:.85rem;line-height:1.8;color:var(--text-dim)"></div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>APS 2020/2 · Análise de Performance de Algoritmos de Ordenação · Estrutura de Dados</span>
+  <span>Fernando · William · Matheus · Gabriel</span>
+</footer>
+
+<script>
+/* ── SORTING ALGORITHMS ── */
+
+function bubbleSort(arr) {
+  const a = arr.slice();
+  const t0 = performance.now();
+  const n = a.length;
+  for (let i = 0; i < n - 1; i++) {
+    let swapped = false;
+    for (let j = 0; j < n - i - 1; j++) {
+      if (a[j] > a[j + 1]) {
+        const tmp = a[j]; a[j] = a[j+1]; a[j+1] = tmp;
+        swapped = true;
+      }
+    }
+    if (!swapped) break;
+  }
+  return { sorted: a, time: performance.now() - t0 };
+}
+
+function selectionSort(arr) {
+  const a = arr.slice();
+  const t0 = performance.now();
+  const n = a.length;
+  for (let i = 0; i < n - 1; i++) {
+    let minIdx = i;
+    for (let j = i + 1; j < n; j++) if (a[j] < a[minIdx]) minIdx = j;
+    if (minIdx !== i) { const tmp = a[i]; a[i] = a[minIdx]; a[minIdx] = tmp; }
+  }
+  return { sorted: a, time: performance.now() - t0 };
+}
+
+function insertionSort(arr) {
+  const a = arr.slice();
+  const t0 = performance.now();
+  const n = a.length;
+  for (let i = 1; i < n; i++) {
+    const key = a[i]; let j = i - 1;
+    while (j >= 0 && a[j] > key) { a[j+1] = a[j]; j--; }
+    a[j+1] = key;
+  }
+  return { sorted: a, time: performance.now() - t0 };
+}
+
+function quickSort(arr) {
+  const a = arr.slice();
+  const t0 = performance.now();
+  function qs(lo, hi) {
+    if (lo >= hi) return;
+    const pivot = a[hi]; let i = lo - 1;
+    for (let j = lo; j < hi; j++) {
+      if (a[j] <= pivot) { i++; const tmp = a[i]; a[i] = a[j]; a[j] = tmp; }
+    }
+    const tmp = a[i+1]; a[i+1] = a[hi]; a[hi] = tmp;
+    const p = i + 1; qs(lo, p - 1); qs(p + 1, hi);
+  }
+  qs(0, a.length - 1);
+  return { sorted: a, time: performance.now() - t0 };
+}
+
+function mergeSort(arr) {
+  const t0 = performance.now();
+  function ms(a) {
+    if (a.length <= 1) return a;
+    const mid = a.length >> 1;
+    const L = ms(a.slice(0, mid)), R = ms(a.slice(mid));
+    const res = []; let i = 0, j = 0;
+    while (i < L.length && j < R.length) res.push(L[i] <= R[j] ? L[i++] : R[j++]);
+    return res.concat(L.slice(i)).concat(R.slice(j));
+  }
+  return { sorted: ms(arr.slice()), time: performance.now() - t0 };
+}
+
+/* ── DATA GENERATION ── */
+
+function generateRandom(n, type, min, max) {
+  const range = max - min + 1;
+  let arr = Array.from({ length: n }, () => Math.floor(Math.random() * range) + min);
+  if (type === 'sorted') arr.sort((a, b) => a - b);
+  else if (type === 'reversed') arr.sort((a, b) => b - a);
+  else if (type === 'partial') {
+    arr.sort((a, b) => a - b);
+    const s = Math.floor(n * 0.1);
+    for (let i = 0; i < s; i++) {
+      const x = Math.floor(Math.random() * n), y = Math.floor(Math.random() * n);
+      [arr[x], arr[y]] = [arr[y], arr[x]];
+    }
+  }
+  return arr;
+}
+
+function parseManual(text) {
+  return text.split(/[\s,;\n]+/).map(s => s.trim()).filter(Boolean)
+             .map(s => parseFloat(s)).filter(v => !isNaN(v));
+}
+
+/* ── UI ── */
+
+let activeTab = 'random', fileData = null;
+
+function switchTab(name, btn) {
+  activeTab = name;
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+document.querySelectorAll('.algo-item').forEach(item => {
+  item.addEventListener('click', () => {
+    item.classList.toggle('checked');
+    const cb = item.querySelector('input');
+    if (cb) cb.checked = item.classList.contains('checked');
+  });
+});
+
+document.getElementById('fileInput').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  document.getElementById('fileName').style.display = 'block';
+  document.getElementById('fileName').textContent = '📄 ' + file.name;
+  const reader = new FileReader();
+  reader.onload = ev => { fileData = parseManual(ev.target.result); };
+  reader.readAsText(file);
+});
+
+function formatTime(ms) {
+  if (ms < 1) return ms.toFixed(3) + ' ms';
+  if (ms < 1000) return ms.toFixed(2) + ' ms';
+  return (ms / 1000).toFixed(3) + ' s';
+}
+
+/* ── MAIN RUN ── */
+
+const ALGOS = {
+  bubble:    { fn: bubbleSort,    name: 'Bubble Sort',    color: '#e05555' },
+  selection: { fn: selectionSort, name: 'Selection Sort', color: '#e0b855' },
+  insertion: { fn: insertionSort, name: 'Insertion Sort', color: '#5591e0' },
+  quick:     { fn: quickSort,     name: 'Quick Sort',     color: '#a855e0' },
+  merge:     { fn: mergeSort,     name: 'Merge Sort',     color: '#4fc86a' },
+};
+const LIMIT_QUADRATIC = 80000;
+
+function runAll() {
+  let data;
+  if (activeTab === 'random') {
+    const n   = parseInt(document.getElementById('randomSize').value);
+    const typ = document.getElementById('randomType').value;
+    const mn  = parseInt(document.getElementById('rangeMin').value) || 1;
+    const mx  = parseInt(document.getElementById('rangeMax').value) || 1000000;
+    data = generateRandom(n, typ, mn, mx);
+  } else if (activeTab === 'manual') {
+    data = parseManual(document.getElementById('manualInput').value);
+    if (!data.length) { alert('Nenhum dado válido encontrado.'); return; }
+  } else {
+    if (!fileData || !fileData.length) { alert('Nenhum arquivo carregado.'); return; }
+    data = fileData;
+  }
+
+  const selected = [];
+  document.querySelectorAll('.algo-item.checked').forEach(item => selected.push(item.dataset.algo));
+  if (!selected.length) { alert('Selecione pelo menos um algoritmo.'); return; }
+
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true;
+  document.getElementById('btnText').style.display = 'none';
+  document.getElementById('spinner').style.display = 'block';
+
+  setTimeout(() => {
+    const results = [];
+    const n = data.length;
+    for (const key of selected) {
+      const alg = ALGOS[key];
+      const isQ = key === 'bubble' || key === 'selection' || key === 'insertion';
+      if (isQ && n > LIMIT_QUADRATIC) { results.push({ key, ...alg, time: null, sorted: null }); continue; }
+      const res = alg.fn(data);
+      results.push({ key, ...alg, time: res.time, sorted: res.sorted });
+    }
+    renderResults(data, results, n);
+    btn.disabled = false;
+    document.getElementById('btnText').style.display = '';
+    document.getElementById('spinner').style.display = 'none';
+  }, 50);
+}
+
+function renderResults(original, results, n) {
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('results').className = 'results-visible';
+
+  const valid = results.filter(r => r.time !== null).sort((a, b) => a.time - b.time);
+  const maxTime = valid.length ? valid[valid.length - 1].time : 1;
+
+  document.getElementById('statN').textContent = n.toLocaleString('pt-BR');
+  document.getElementById('statFastest').textContent = valid.length ? valid[0].name : '—';
+  document.getElementById('statBestTime').textContent = valid.length ? formatTime(valid[0].time) : '—';
+  document.getElementById('statCount').textContent = valid.length;
+
+  const prev20 = original.slice(0, 20);
+  const sorted20 = valid.length ? valid[0].sorted.slice(0, 20) : prev20.slice().sort((a,b)=>a-b);
+  document.getElementById('previewBefore').innerHTML =
+    prev20.map(v => <span>${v}</span>).join(', ') + (n > 20 ? ', ...' : '');
+  document.getElementById('previewAfter').innerHTML =
+    sorted20.map(v => <span style="color:#4fc86a">${v}</span>).join(', ') + (n > 20 ? ', ...' : '');
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  const allOrdered = [...valid, ...results.filter(r => r.time === null)];
+  allOrdered.forEach((r, idx) => {
+    const rank = r.time !== null ? idx + 1 : '—';
+    const rc = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+    const pct = r.time !== null ? (r.time / maxTime * 100) : 0;
+    const timeStr = r.time !== null ? formatTime(r.time) : '<span style="color:var(--text-dim);font-size:.75rem">N/A (muito grande)</span>';
+    tbody.innerHTML += `
+      <tr class="${rank === 1 ? 'winner' : ''}">
+        <td><span class="rank-badge ${rc}">${rank}</span></td>
+        <td style="font-weight:600;color:${r.color}">${r.name}</td>
+        <td>${timeStr}</td>
+        <td>${r.time !== null ? `
+          <div class="bar-wrap">
+            <div class="bar-outer"><div class="bar-inner" style="width:${pct}%;background:${r.color}"></div></div>
+            <div class="time-val" style="color:${r.color}">${pct.toFixed(1)}%</div>
+          </div>` : '<span style="color:var(--text-dim)">—</span>'}</td>
+      </tr>`;
+  });
+
+  drawChart(valid);
+  renderAnalysis(valid, n);
+}
+
+/* ── CHART ── */
+
+function drawChart(results) {
+  const canvas = document.getElementById('chart');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth || 700;
+  canvas.height = 220;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!results.length) return;
+
+  const padL = 70, padR = 20, padT = 20, padB = 50;
+  const w = canvas.width - padL - padR, h = canvas.height - padT - padB;
+  const barW = Math.min(80, (w / results.length) * 0.65);
+  const gap = w / results.length;
+  const maxTime = results[results.length - 1].time;
+
+  ctx.strokeStyle = '#2a3d2e'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + h - (h * i / 4);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + w, y); ctx.stroke();
+    ctx.fillStyle = '#7fa88a'; ctx.font = '10px Arial'; ctx.textAlign = 'right';
+    ctx.fillText(formatTime(maxTime * i / 4), padL - 6, y + 4);
+  }
+
+  results.forEach((r, i) => {
+    const x = padL + gap * i + gap / 2 - barW / 2;
+    const barH = maxTime > 0 ? (r.time / maxTime) * h : 0;
+    const y = padT + h - barH;
+    const grad = ctx.createLinearGradient(x, y, x, padT + h);
+    grad.addColorStop(0, r.color); grad.addColorStop(1, r.color + '44');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect(x, y, barW, barH, [4,4,0,0]);
+    ctx.fill();
+    ctx.fillStyle = '#d4e8d8'; ctx.font = '11px Arial'; ctx.textAlign = 'center';
+    ctx.fillText(r.name.replace(' Sort',''), padL + gap * i + gap / 2, padT + h + 16);
+    ctx.fillStyle = r.color; ctx.font = 'bold 10px Arial';
+    ctx.fillText(formatTime(r.time), padL + gap * i + gap / 2, y - 5);
+  });
+}
+
+/* ── ANALYSIS ── */
+
+function renderAnalysis(valid, n) {
+  const el = document.getElementById('analysisText');
+  if (!valid.length) { el.textContent = 'Nenhum resultado disponível.'; return; }
+  const fastest = valid[0], slowest = valid[valid.length - 1];
+  const ratio = slowest.time / fastest.time;
+  const efficient = ['Quick Sort','Merge Sort'];
+  const hasQuad = valid.some(r => !efficient.includes(r.name));
+  const hasEff  = valid.some(r => efficient.includes(r.name));
+
+  let text = `<p>Para <strong style="color:var(--accent)">${n.toLocaleString('pt-BR')} elementos</strong>, o algoritmo mais rápido foi o 
+    <strong style="color:${fastest.color}">${fastest.name}</strong> com <strong>${formatTime(fastest.time)}</strong>.</p>`;
+  if (valid.length > 1)
+    text += `<p style="margin-top:8px">O mais lento foi o <strong style="color:${slowest.color}">${slowest.name}</strong> 
+    com <strong>${formatTime(slowest.time)}</strong> — <strong>${ratio.toFixed(1)}x mais lento</strong> que o vencedor.</p>`;
+  if (hasQuad && hasEff && n >= 1000)
+    text += <p style="margin-top:8px">⚡ Com ${n.toLocaleString('pt-BR')} elementos, a diferença entre O(n log n) e O(n²) fica evidente. Quick Sort e Merge Sort escalam muito melhor para grandes volumes — como os ~100 mil registros diários dos satélites da Amazônia.</p>;
+  if (n < 100)
+    text += <p style="margin-top:8px">💡 Com poucos elementos todos os algoritmos são rápidos. Aumente o tamanho da entrada para ver diferenças significativas.</p>;
+  el.innerHTML = text;
+}
+
+window.addEventListener('resize', () => {
+  const c = document.getElementById('chart');
+  if (c) c.width = c.offsetWidth;
+});
+</script>
+</body>
+</html>
+
+
