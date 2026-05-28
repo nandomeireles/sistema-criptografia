@@ -38,8 +38,8 @@ Organização e modularização de código
 ---
 
 # 💻 Tecnologias Utilizadas
-Linguagem C
-GCC Compiler
+- Linguagem C
+- GCC Compiler
 
 ---
 
