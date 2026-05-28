@@ -26,14 +26,14 @@ Além disso, o sistema busca apresentar conceitos fundamentais de segurança da 
 
 Desenvolver conhecimentos práticos em programação estruturada utilizando a linguagem C, aplicando conceitos de:
 
-Criptografia
-Segurança da Informação
-Manipulação de Strings
-Estruturas de Controle
-Funções
-Tratamento de Dados
-Validação de Entradas
-Organização e modularização de código
+- Criptografia
+- Segurança da Informação
+- Manipulação de Strings
+- Estruturas de Controle
+- Funções
+- Tratamento de Dados
+- Validação de Entradas
+- Organização e modularização de código
 
 ---
 
@@ -44,14 +44,14 @@ Organização e modularização de código
 ---
 
 # ⚙️ Funcionalidades
-Criptografia de mensagens
-Descriptografia de mensagens
-Utilização de chave secreta personalizada
-Demonstração automática do algoritmo
-Menu interativo no terminal
-Validação de entradas
-Tratamento de erros
-Suporte para mensagens de até 128 caracteres
+- Criptografia de mensagens
+- Descriptografia de mensagens
+- Utilização de chave secreta personalizada
+- Demonstração automática do algoritmo
+- Menu interativo no terminal
+- Validação de entradas
+- Tratamento de erros
+- Suporte para mensagens de até 128 caracteres
 
 ---
 
@@ -86,12 +86,12 @@ Othhwrsvv ...
 ---
 
 # 🛡️ Temas Abordados
-Criptografia
-Cifra de Vigenère
-Segurança da Informação
-Comunicação Segura
-Criptografia Polialfabética
-Proteção de Dados
-Programação Estruturada em C
-Manipulação de Strings
-Segurança em Sistemas
+- Criptografia
+- Cifra de Vigenère
+- Segurança da Informação
+- Comunicação Segura
+- Criptografia Polialfabética
+- Proteção de Dados
+- Programação Estruturada em C
+- Manipulação de Strings
+- Segurança em Sistemas
