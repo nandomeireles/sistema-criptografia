@@ -65,10 +65,15 @@ Essa técnica foi escolhida por possuir maior segurança em relação às cifras
 
 # ▶️ Como Executar
 Compilar o programa
+
 gcc "Técnicas Criptográficas.c" -o criptografia
+
 Executar no Windows
+
 .\criptografia.exe
+
 Executar no Linux/Mac
+
 ./criptografia
 
 ---
